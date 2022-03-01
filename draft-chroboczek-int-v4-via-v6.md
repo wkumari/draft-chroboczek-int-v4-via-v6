@@ -4,7 +4,7 @@ abbrev: "v4-via-v6"
 category: std
 submissiontype: IETF
 
-docname: draft-chroboczek-int-v4-via-v6
+docname: draft-chroboczek-int-v4-via-v6-latest
 v: 3
 area: INT
 workgroup: WG Working Group
