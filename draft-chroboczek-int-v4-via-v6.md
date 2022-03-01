@@ -6,16 +6,16 @@ submissiontype: IETF
 
 docname: draft-chroboczek-int-v4-via-v6-latest
 v: 3
-area: INT
-workgroup: WG Working Group
+area: "Internet Engineering Steering Group"
+workgroup: "Internet Area"
 keyword: Internet-Draft
 venue:
-  group: WG
-  type: Working Group
-  mail: WG@example.com
-  arch: https://example.com/WG
-  github: USER/REPO
-  latest: https://example.com/LATEST
+  group: "Internet Area"
+  type: "Area"
+  mail: ""
+  arch: ""
+  github: "wkumari/draft-chroboczek-int-v4-via-v6"
+  latest: "https://wkumari.github.io/draft-chroboczek-int-v4-via-v6/draft-chroboczek-int-v4-via-v6.html"
 
 author:
  -
