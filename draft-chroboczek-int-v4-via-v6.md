@@ -43,7 +43,7 @@ informative:
   rfc1191:
   rfc4821:
   IANA-IPV4-REGISTRY:
-    title: IP for Smart Objects (IPSO)
+    title: IANA IPv4 Address Registry
     author:
     - org:
     date: false
@@ -104,7 +104,7 @@ We call a route towards an IPv4 prefix that uses an IPv6 next hop a
 "v4-via-v6" route.
 
 This document discusses the protocol design and operations implications
-of such routes, and is designed to be used as a reference for future
+of such routes and is designed to be used as a reference for future
 documents.
 
 { Editor note, to be removed before publication. This document is heavily based
