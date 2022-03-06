@@ -123,7 +123,58 @@ cleanly in the future. }
 
 {::boilerplate bcp14-tagged}
 
-# Operational Considerations
+# Operation
+
+Next-hop routing is implemented by two separate components, the routing
+protocol and the forwarding procedure, that communicate through a shared
+data structure, the routing table.
+
+## Structure of the routing table
+
+The routing table is a data structure that maps address prefixes to
+next-hops, pairs of the form (interface, address).  In traditional
+next-hop routing, the routing table maps IPv4 prefixes to IPv4 next hops,
+and IPv6 addresses to IPv6 next hops.  With v4-via-v6 routing, the routing
+table is extended so that an IPv4 prefix may map to either an IPv4 or an
+IPv6 next hop.
+
+## Operation of the forwarding plane
+
+The forwarding plane is the part of the routing implementation that is
+executed for every forwarded packet.  As a packet arrives, the forwarding
+plane consults the routing table, selects a single route matching the
+packet, determines the next-hop address, and forwards the packet to the
+next-hop address.
+
+With v4-via-v6 routing, the address family of the next-hop address is no
+longer dermined by the address family of the prefix: since the routing
+table may map an IPv4 prefix to either an IPv4 or an IPv6 prefix, the
+forwarding plane must be able to determine, on a per-packet basis, whether
+the next-hop address is an IPv4 or an IPv6 address, and to use that
+information in order to determine the right address resolution protocol to
+use (ARP for IP4, ND for IPv6).
+
+## Operation of routing protocols
+
+The routing protocol is the part of the routing implementation that is
+executed asynchronously from the forwarding plane, and whose role is to
+build the routing table.  Since v4-via-v6 routing is a generalisation of
+traditional next-hop routing, v4-via-v6 can interoperate with existing
+routing protocols: a traditional routing protocol produces a traditional
+next-hop routing table, which can be used by an implementation supporting
+v4-via-v6 routing.
+
+However, in order to use the additional flexibility provided by v4-via-v6
+routing, routing protocols will need to be extended with the ability to
+populate the routing table with v4-via-v6 routes when an IPv4 address is
+not available or when the available IPv4 addresses are not suitable for
+use as a next-hop (e.g., not stable enough).
+
+### Distance-vector routing protocols
+
+### Link-state routing protocols
+
+# ICMP Considerations
 
 The Internet Control Message Protocol (ICMPv4, or simply ICMP)
 [RFC0792] is a protocol related to IPv4 that is primarily used to
