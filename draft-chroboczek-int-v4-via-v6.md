@@ -53,17 +53,22 @@ informative:
 
 --- abstract
 
-This document discusses implications and considerations for routes to an IPv4 prefix with an IPv6 next-hop, to allow IPv4 traffic to flow through interfaces
-and devices that have not been assigned an IPv4 address.
+We propose "v4-via-v6" routing, a technique that uses IPv6 next-hop
+addresses for routing IPv4 packets, thus making it possible to route IPv4
+packets across a network where routers have not been assigned IPv4
+addresses.  We describe the technique, and discuss its operational
+implications.
 
 --- middle
 
 # Introduction
 
-The role of a routing protocol is to build a routing table, a data
-structure that maps network prefixes in a given family (IPv4 or IPv6)
-to next hops, pairs of an outgoing interface and a neighbor's
-network address, for example:
+The dominant form of routing in the Internet is next-hop routing, where
+a routing protocol constructs a routing table which is used by
+a forwarding process to forward packets.  The routing table is a data
+structure that maps network prefixes in a given family (IPv4 or IPv6) to
+next hops, pairs of an outgoing interface and a neighbor's network
+address, for example:
 
 
         destination                      next hop
@@ -71,23 +76,23 @@ network address, for example:
       203.0.113.0/24                  eth0, 192.0.2.1
 
 When a packet is routed according to a given routing table entry, the
-forwarding plane typically uses a neighbor discovery protocol (the
-Neighbor Discovery protocol (ND) [RFC4861] in the case of IPv6, the
-Address Resolution Protocol (ARP) [RFC0826] in the case of IPv4) to
-map the next-hop address to a link-layer address (a "MAC address"),
-which is then used to construct the link-layer frames that
-encapsulate forwarded packets.
+forwarding plane uses a neighbor discovery protocol (the Neighbor
+Discovery protocol (ND) [RFC4861] in the case of IPv6, the Address
+Resolution Protocol (ARP) [RFC0826] in the case of IPv4) to map the
+next-hop address to a link-layer address (a "MAC address"), which is then
+used to construct the link-layer frames that encapsulate forwarded
+packets.
 
-It is apparent from the description above that there is no
-fundamental reason why the destination prefix and the next-hop
-address should be in the same address family: there is nothing
-preventing an IPv6 packet from being routed through a next hop with
-an IPv4 address (in which case the next hop's MAC address will be
-obtained using ARP), or, conversely, an IPv4 packet from being routed
-through a next hop with an IPv6 address.  (In fact, it is even
-possible to store link-layer addresses directly in the next-hop entry
-of the routing table, which is commonly done in networks using the
-OSI protocol suite).
+It is apparent from the description above that there is no fundamental
+reason why the destination prefix and the next-hop address should be in
+the same address family: there is nothing preventing an IPv6 packet from
+being routed through a next hop with an IPv4 address (in which case the
+next hop's MAC address will be obtained using ARP), or, conversely, an
+IPv4 packet from being routed through a next hop with an IPv6 address.
+(In fact, it is even possible to store link-layer addresses directly in
+the next-hop entry of the routing table, thus avoiding the use of an
+address resolution protocol altogether, which is commonly done in networks
+using the OSI protocol suite).
 
 The case of routing IPv4 packets through an IPv6 next hop is
 particularly interesting, since it makes it possible to build
