@@ -265,8 +265,21 @@ likely require "magic" to allow it to pass BCP38 filters.
 
 # Security Considerations
 
-TODO.
+The techniques described in this document make routing more flexible by
+allowing IPv4 routes to propagate across a section of a network that has
+only been assigned IPv6 addresses.  This additional flexibility might
+invalidate otherwise reasonable assumptions made by network
+administrators, which could potentially cause security issues.
 
+For example, if an island of IPv4-only hosts is separated from the IPv4
+Internet by routers that have not been assigned IPv4 addresses, a network
+administrator might reasonably assume that the IPv4-only hosts are
+unreachable from the IPv4 Internet.  This assumption is broken if the
+intermediary routers implement v4-via-v6 routing, which might make the
+IPv4-only hosts reachable from the IPv4 Internet.  If this is not
+desirable, then the network administrator must filter out the undesirable
+traffic in the forwarding plane by implementing suitable packet filtering
+rules.
 
 # IANA Considerations
 
