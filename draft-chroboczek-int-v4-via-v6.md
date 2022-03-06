@@ -53,17 +53,22 @@ informative:
 
 --- abstract
 
-This document discusses implications and considerations for routes to an IPv4 prefix with an IPv6 next-hop, to allow IPv4 traffic to flow through interfaces
-and devices that have not been assigned an IPv4 address.
+We propose "v4-via-v6" routing, a technique that uses IPv6 next-hop
+addresses for routing IPv4 packets, thus making it possible to route IPv4
+packets across a network where routers have not been assigned IPv4
+addresses.  We describe the technique, and discuss its operational
+implications.
 
 --- middle
 
 # Introduction
 
-The role of a routing protocol is to build a routing table, a data
-structure that maps network prefixes in a given family (IPv4 or IPv6)
-to next hops, pairs of an outgoing interface and a neighbor's
-network address, for example:
+The dominant form of routing in the Internet is next-hop routing, where
+a routing protocol constructs a routing table which is used by
+a forwarding process to forward packets.  The routing table is a data
+structure that maps network prefixes in a given family (IPv4 or IPv6) to
+next hops, pairs of an outgoing interface and a neighbor's network
+address, for example:
 
 
         destination                      next hop
@@ -71,23 +76,23 @@ network address, for example:
       203.0.113.0/24                  eth0, 192.0.2.1
 
 When a packet is routed according to a given routing table entry, the
-forwarding plane typically uses a neighbor discovery protocol (the
-Neighbor Discovery protocol (ND) [RFC4861] in the case of IPv6, the
-Address Resolution Protocol (ARP) [RFC0826] in the case of IPv4) to
-map the next-hop address to a link-layer address (a "MAC address"),
-which is then used to construct the link-layer frames that
-encapsulate forwarded packets.
+forwarding plane uses a neighbor discovery protocol (the Neighbor
+Discovery protocol (ND) [RFC4861] in the case of IPv6, the Address
+Resolution Protocol (ARP) [RFC0826] in the case of IPv4) to map the
+next-hop address to a link-layer address (a "MAC address"), which is then
+used to construct the link-layer frames that encapsulate forwarded
+packets.
 
-It is apparent from the description above that there is no
-fundamental reason why the destination prefix and the next-hop
-address should be in the same address family: there is nothing
-preventing an IPv6 packet from being routed through a next hop with
-an IPv4 address (in which case the next hop's MAC address will be
-obtained using ARP), or, conversely, an IPv4 packet from being routed
-through a next hop with an IPv6 address.  (In fact, it is even
-possible to store link-layer addresses directly in the next-hop entry
-of the routing table, which is commonly done in networks using the
-OSI protocol suite).
+It is apparent from the description above that there is no fundamental
+reason why the destination prefix and the next-hop address should be in
+the same address family: there is nothing preventing an IPv6 packet from
+being routed through a next hop with an IPv4 address (in which case the
+next hop's MAC address will be obtained using ARP), or, conversely, an
+IPv4 packet from being routed through a next hop with an IPv6 address.
+(In fact, it is even possible to store link-layer addresses directly in
+the next-hop entry of the routing table, thus avoiding the use of an
+address resolution protocol altogether, which is commonly done in networks
+using the OSI protocol suite).
 
 The case of routing IPv4 packets through an IPv6 next hop is
 particularly interesting, since it makes it possible to build
@@ -118,7 +123,58 @@ cleanly in the future. }
 
 {::boilerplate bcp14-tagged}
 
-# Operational Considerations
+# Operation
+
+Next-hop routing is implemented by two separate components, the routing
+protocol and the forwarding procedure, that communicate through a shared
+data structure, the routing table.
+
+## Structure of the routing table
+
+The routing table is a data structure that maps address prefixes to
+next-hops, pairs of the form (interface, address).  In traditional
+next-hop routing, the routing table maps IPv4 prefixes to IPv4 next hops,
+and IPv6 addresses to IPv6 next hops.  With v4-via-v6 routing, the routing
+table is extended so that an IPv4 prefix may map to either an IPv4 or an
+IPv6 next hop.
+
+## Operation of the forwarding plane
+
+The forwarding plane is the part of the routing implementation that is
+executed for every forwarded packet.  As a packet arrives, the forwarding
+plane consults the routing table, selects a single route matching the
+packet, determines the next-hop address, and forwards the packet to the
+next-hop address.
+
+With v4-via-v6 routing, the address family of the next-hop address is no
+longer dermined by the address family of the prefix: since the routing
+table may map an IPv4 prefix to either an IPv4 or an IPv6 prefix, the
+forwarding plane must be able to determine, on a per-packet basis, whether
+the next-hop address is an IPv4 or an IPv6 address, and to use that
+information in order to determine the right address resolution protocol to
+use (ARP for IP4, ND for IPv6).
+
+## Operation of routing protocols
+
+The routing protocol is the part of the routing implementation that is
+executed asynchronously from the forwarding plane, and whose role is to
+build the routing table.  Since v4-via-v6 routing is a generalisation of
+traditional next-hop routing, v4-via-v6 can interoperate with existing
+routing protocols: a traditional routing protocol produces a traditional
+next-hop routing table, which can be used by an implementation supporting
+v4-via-v6 routing.
+
+However, in order to use the additional flexibility provided by v4-via-v6
+routing, routing protocols will need to be extended with the ability to
+populate the routing table with v4-via-v6 routes when an IPv4 address is
+not available or when the available IPv4 addresses are not suitable for
+use as a next-hop (e.g., not stable enough).
+
+### Distance-vector routing protocols
+
+### Link-state routing protocols
+
+# ICMP Considerations
 
 The Internet Control Message Protocol (ICMPv4, or simply ICMP)
 [RFC0792] is a protocol related to IPv4 that is primarily used to
@@ -209,8 +265,21 @@ likely require "magic" to allow it to pass BCP38 filters.
 
 # Security Considerations
 
-TODO.
+The techniques described in this document make routing more flexible by
+allowing IPv4 routes to propagate across a section of a network that has
+only been assigned IPv6 addresses.  This additional flexibility might
+invalidate otherwise reasonable assumptions made by network
+administrators, which could potentially cause security issues.
 
+For example, if an island of IPv4-only hosts is separated from the IPv4
+Internet by routers that have not been assigned IPv4 addresses, a network
+administrator might reasonably assume that the IPv4-only hosts are
+unreachable from the IPv4 Internet.  This assumption is broken if the
+intermediary routers implement v4-via-v6 routing, which might make the
+IPv4-only hosts reachable from the IPv4 Internet.  If this is not
+desirable, then the network administrator must filter out the undesirable
+traffic in the forwarding plane by implementing suitable packet filtering
+rules.
 
 # IANA Considerations
 
