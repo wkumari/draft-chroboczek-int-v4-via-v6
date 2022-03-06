@@ -5,8 +5,8 @@
 Internet Area                                              J. Chroboczek
 Internet-Draft                                 IRIF, University of Paris
 Intended status: Standards Track                               W. Kumari
-Expires: 6 September 2022                                    Google, LLC
-                                                            5 March 2022
+Expires: 7 September 2022                                    Google, LLC
+                                                            6 March 2022
 
 
                    IPv4 routes with an IPv6 next hop
@@ -14,10 +14,11 @@ Expires: 6 September 2022                                    Google, LLC
 
 Abstract
 
-   This document discusses implications and considerations for routes to
-   an IPv4 prefix with an IPv6 next-hop, to allow IPv4 traffic to flow
-   through interfaces and devices that have not been assigned an IPv4
-   address.
+   We propose "v4-via-v6" routing, a technique that uses IPv6 next-hop
+   addresses for routing IPv4 packets, thus making it possible to route
+   IPv4 packets across a network where routers have not been assigned
+   IPv4 addresses.  We describe the technique, and discuss its
+   operational implications.
 
 About This Document
 
@@ -48,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 September 2022.
+   This Internet-Draft will expire on 7 September 2022.
 
 Copyright Notice
 
@@ -68,18 +69,26 @@ Table of Contents
 
    1.  Introduction
    2.  Conventions and Definitions
-   3.  Operational Considerations
-   4.  Security Considerations
-   5.  IANA Considerations
-   6.  References
-     6.1.  Normative References
-     6.2.  Informative References
+   3.  Operation
+     3.1.  Structure of the routing table
+     3.2.  Operation of the forwarding plane
+     3.3.  Operation of routing protocols
+       3.3.1.  Distance-vector routing protocols
+       3.3.2.  Link-state routing protocols
+   4.  ICMP Considerations
+   5.  Security Considerations
+   6.  IANA Considerations
+   7.  References
+     7.1.  Normative References
+     7.2.  Informative References
    Acknowledgments
    Authors' Addresses
 
 1.  Introduction
 
-   The role of a routing protocol is to build a routing table, a data
+   The dominant form of routing in the Internet is next-hop routing,
+   where a routing protocol constructs a routing table which is used by
+   a forwarding process to forward packets.  The routing table is a data
    structure that maps network prefixes in a given family (IPv4 or IPv6)
    to next hops, pairs of an outgoing interface and a neighbor's network
    address, for example:
@@ -89,12 +98,12 @@ Table of Contents
      203.0.113.0/24                  eth0, 192.0.2.1
 
    When a packet is routed according to a given routing table entry, the
-   forwarding plane typically uses a neighbor discovery protocol (the
-   Neighbor Discovery protocol (ND) [rfc4861] in the case of IPv6, the
-   Address Resolution Protocol (ARP) [rfc0826] in the case of IPv4) to
-   map the next-hop address to a link-layer address (a "MAC address"),
-   which is then used to construct the link-layer frames that
-   encapsulate forwarded packets.
+   forwarding plane uses a neighbor discovery protocol (the Neighbor
+   Discovery protocol (ND) [rfc4861] in the case of IPv6, the Address
+   Resolution Protocol (ARP) [rfc0826] in the case of IPv4) to map the
+   next-hop address to a link-layer address (a "MAC address"), which is
+   then used to construct the link-layer frames that encapsulate
+   forwarded packets.
 
    It is apparent from the description above that there is no
    fundamental reason why the destination prefix and the next-hop
@@ -104,8 +113,9 @@ Table of Contents
    obtained using ARP), or, conversely, an IPv4 packet from being routed
    through a next hop with an IPv6 address.  (In fact, it is even
    possible to store link-layer addresses directly in the next-hop entry
-   of the routing table, which is commonly done in networks using the
-   OSI protocol suite).
+   of the routing table, thus avoiding the use of an address resolution
+   protocol altogether, which is commonly done in networks using the OSI
+   protocol suite).
 
    The case of routing IPv4 packets through an IPv6 next hop is
    particularly interesting, since it makes it possible to build
@@ -140,7 +150,58 @@ Table of Contents
    BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-3.  Operational Considerations
+3.  Operation
+
+   Next-hop routing is implemented by two separate components, the
+   routing protocol and the forwarding procedure, that communicate
+   through a shared data structure, the routing table.
+
+3.1.  Structure of the routing table
+
+   The routing table is a data structure that maps address prefixes to
+   next-hops, pairs of the form (interface, address).  In traditional
+   next-hop routing, the routing table maps IPv4 prefixes to IPv4 next
+   hops, and IPv6 addresses to IPv6 next hops.  With v4-via-v6 routing,
+   the routing table is extended so that an IPv4 prefix may map to
+   either an IPv4 or an IPv6 next hop.
+
+3.2.  Operation of the forwarding plane
+
+   The forwarding plane is the part of the routing implementation that
+   is executed for every forwarded packet.  As a packet arrives, the
+   forwarding plane consults the routing table, selects a single route
+   matching the packet, determines the next-hop address, and forwards
+   the packet to the next-hop address.
+
+   With v4-via-v6 routing, the address family of the next-hop address is
+   no longer dermined by the address family of the prefix: since the
+   routing table may map an IPv4 prefix to either an IPv4 or an IPv6
+   prefix, the forwarding plane must be able to determine, on a per-
+   packet basis, whether the next-hop address is an IPv4 or an IPv6
+   address, and to use that information in order to determine the right
+   address resolution protocol to use (ARP for IP4, ND for IPv6).
+
+3.3.  Operation of routing protocols
+
+   The routing protocol is the part of the routing implementation that
+   is executed asynchronously from the forwarding plane, and whose role
+   is to build the routing table.  Since v4-via-v6 routing is a
+   generalisation of traditional next-hop routing, v4-via-v6 can
+   interoperate with existing routing protocols: a traditional routing
+   protocol produces a traditional next-hop routing table, which can be
+   used by an implementation supporting v4-via-v6 routing.
+
+   However, in order to use the additional flexibility provided by
+   v4-via-v6 routing, routing protocols will need to be extended with
+   the ability to populate the routing table with v4-via-v6 routes when
+   an IPv4 address is not available or when the available IPv4 addresses
+   are not suitable for use as a next-hop (e.g., not stable enough).
+
+3.3.1.  Distance-vector routing protocols
+
+3.3.2.  Link-state routing protocols
+
+4.  ICMP Considerations
 
    The Internet Control Message Protocol (ICMPv4, or simply ICMP)
    [rfc0792] is a protocol related to IPv4 that is primarily used to
@@ -226,17 +287,32 @@ Table of Contents
    some more global pool, it would still likely require "magic" to allow
    it to pass BCP38 filters. }
 
-4.  Security Considerations
+5.  Security Considerations
 
-   TODO.
+   The techniques described in this document make routing more flexible
+   by allowing IPv4 routes to propagate across a section of a network
+   that has only been assigned IPv6 addresses.  This additional
+   flexibility might invalidate otherwise reasonable assumptions made by
+   network administrators, which could potentially cause security
+   issues.
 
-5.  IANA Considerations
+   For example, if an island of IPv4-only hosts is separated from the
+   IPv4 Internet by routers that have not been assigned IPv4 addresses,
+   a network administrator might reasonably assume that the IPv4-only
+   hosts are unreachable from the IPv4 Internet.  This assumption is
+   broken if the intermediary routers implement v4-via-v6 routing, which
+   might make the IPv4-only hosts reachable from the IPv4 Internet.  If
+   this is not desirable, then the network administrator must filter out
+   the undesirable traffic in the forwarding plane by implementing
+   suitable packet filtering rules.
+
+6.  IANA Considerations
 
    This document has no IANA actions.
 
-6.  References
+7.  References
 
-6.1.  Normative References
+7.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -252,7 +328,7 @@ Table of Contents
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
-6.2.  Informative References
+7.2.  Informative References
 
    [IANA-IPV4-REGISTRY]
               "IANA IPv4 Address Registry", Web 
