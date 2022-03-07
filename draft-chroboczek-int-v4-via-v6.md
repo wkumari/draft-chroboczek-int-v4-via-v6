@@ -33,6 +33,7 @@ author:
     email: warren@kumari.net
  -
     name: Toke Høiland-Jørgensen
+    organization: Red Hat
     email: toke@toke.dk
 
 normative:
