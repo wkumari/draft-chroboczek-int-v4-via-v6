@@ -126,7 +126,7 @@ cleanly in the future. }
 # Operation
 
 Next-hop routing is implemented by two separate components, the routing
-protocol and the forwarding procedure, that communicate through a shared
+protocol and the forwarding plane, that communicate through a shared
 data structure, the routing table.
 
 ## Structure of the routing table
@@ -148,10 +148,10 @@ next-hop address.
 
 With v4-via-v6 routing, the address family of the next-hop address is no
 longer dermined by the address family of the prefix: since the routing
-table may map an IPv4 prefix to either an IPv4 or an IPv6 prefix, the
+table may map an IPv4 prefix to either an IPv4 or an IPv6 next-hop, the
 forwarding plane must be able to determine, on a per-packet basis, whether
 the next-hop address is an IPv4 or an IPv6 address, and to use that
-information in order to determine the right address resolution protocol to
+information in order to choose the right address resolution protocol to
 use (ARP for IP4, ND for IPv6).
 
 ## Operation of routing protocols
