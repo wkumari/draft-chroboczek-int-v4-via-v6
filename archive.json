@@ -1,0 +1,123 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2023-11-09T00:14:48.770436+00:00",
+  "repo": "wkumari/draft-chroboczek-int-v4-via-v6",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOG7h3Ns40AYaV",
+      "title": "main",
+      "url": "https://github.com/wkumari/draft-chroboczek-int-v4-via-v6/pull/1",
+      "state": "MERGED",
+      "author": "jech",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "- Rewrite abstract, tweak introduction.\n- Add section about Operation.\n",
+      "createdAt": "2022-03-06T18:44:22Z",
+      "updatedAt": "2022-03-06T19:25:10Z",
+      "baseRepository": "wkumari/draft-chroboczek-int-v4-via-v6",
+      "baseRefName": "main",
+      "baseRefOid": "162878732d496e74a98e0cdb4b66f291ec0323f7",
+      "headRepository": "jech/draft-chroboczek-int-v4-via-v6",
+      "headRefName": "main",
+      "headRefOid": "dec9452cc81e3235ec5c70458019d3223a58f36f",
+      "closedAt": "2022-03-06T19:25:10Z",
+      "mergedAt": "2022-03-06T19:25:10Z",
+      "mergedBy": "wkumari",
+      "mergeCommit": {
+        "oid": "90ca6c9b586144ab459f956e54f41be463cd61b4"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG7h3Ns41td36",
+          "commit": {
+            "abbreviatedOid": "dec9452"
+          },
+          "author": "wkumari",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Wow, excellent, thank you!\r\n\r\nMerging...",
+          "createdAt": "2022-03-06T19:24:55Z",
+          "updatedAt": "2022-03-06T19:24:55Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDOG7h3Ns40Aa4J",
+      "title": "Compatibility with kdrfc.",
+      "url": "https://github.com/wkumari/draft-chroboczek-int-v4-via-v6/pull/2",
+      "state": "OPEN",
+      "author": "jech",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "These changes appear to be necessary in order to compile the draft\non my system.  Note in particular that my version of xml2rfc appears\nto require an \"ipr\" attribute -- I've picked the value \"trust200902\"\nmore or less at random.\n",
+      "createdAt": "2022-03-06T19:47:04Z",
+      "updatedAt": "2022-03-06T19:50:00Z",
+      "baseRepository": "wkumari/draft-chroboczek-int-v4-via-v6",
+      "baseRefName": "main",
+      "baseRefOid": "90ca6c9b586144ab459f956e54f41be463cd61b4",
+      "headRepository": "jech/draft-chroboczek-int-v4-via-v6",
+      "headRefName": "kdrfc",
+      "headRefOid": "c8e1c3dadbc4421c55e369041e2915f09fda6d92",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    }
+  ]
+}
