@@ -3,6 +3,7 @@ title: "IPv4 routes with an IPv6 next hop"
 abbrev: "v4-via-v6"
 category: std
 submissiontype: IETF
+ipr: trust200902
 
 docname: draft-chroboczek-int-v4-via-v6-latest
 v: 3
@@ -37,15 +38,15 @@ author:
     email: toke@toke.dk
 
 normative:
-  rfc7600:
+  RFC7600:
 
 informative:
-  rfc4861:
-  rfc0826:
-  rfc7404:
-  rfc0792:
-  rfc1191:
-  rfc4821:
+  RFC4861:
+  RFC0826:
+  RFC7404:
+  RFC0792:
+  RFC1191:
+  RFC4821:
   IANA-IPV4-REGISTRY:
     title: IANA IPv4 Address Registry
     author:
