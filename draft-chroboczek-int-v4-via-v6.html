@@ -15,27 +15,24 @@ packets across a network where routers have not been assigned IPv4
 addresses.  We describe the technique, and discuss its operational
 implications. 
     ' name="description">
-<meta content="xml2rfc 3.12.3" name="generator">
+<meta content="xml2rfc 3.18.2" name="generator">
 <meta content="Internet-Draft" name="keyword">
 <meta content="draft-chroboczek-int-v4-via-v6-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.12.3
-    Python 3.9.7
-    appdirs 1.4.4
-    ConfigArgParse 1.3
-    google-i18n-address 2.5.0
-    html5lib 1.1
+  xml2rfc 3.18.2
+    Python 3.11.6
+    ConfigArgParse 1.5.3
+    google-i18n-address 3.1.0
     intervaltree 3.1.0
-    Jinja2 2.11.3
-    kitchen 1.2.6
-    lxml 4.6.5
-    MarkupSafe 2.0.1
-    pycountry 20.7.3
-    pyflakes 2.3.1
-    PyYAML 5.4.1
-    requests 2.26.0
-    setuptools 52.0.0
+    Jinja2 3.1.2
+    lxml 4.9.3
+    platformdirs 4.1.0
+    pycountry 22.3.5
+    PyYAML 6.0
+    requests 2.31.0
+    setuptools 67.7.2
     six 1.16.0
+    wcwidth 0.2.12
 -->
 <link href="draft-chroboczek-int-v4-via-v6.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -159,6 +156,14 @@ implications.
   font-weight: 700;
   font-display: swap;
   src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
@@ -342,7 +347,7 @@ ol, ul {
   padding: 0;
   margin: 0 0 0.5em 2em;
 }
-ol ol, ul ul, ol ul, ul ol {
+:is(ol, ul) :is(ol, ul) {
   margin-left: 1em;
 }
 li {
@@ -357,31 +362,50 @@ ul.empty, .ulEmpty {
 ul.empty li, .ulEmpty li {
   margin-top: 0.5em;
 }
-ul.compact, .ulCompact,
-ol.compact, .olCompact {
-  line-height: 100%;
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  line-height: 1;
   margin: 0 0 0 2em;
 }
 
 /* definition lists */
 dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+}
+dl.olPercent {
+  --indent: 5ch;
 }
 dl > dt {
   float: left;
-  margin-right: 1em;
+  margin-right: 2ch;
+  min-width: 8ch;
+}
+dl.dlNewline > dt {
+  float: none;
 }
 dl > dd {
   margin-bottom: .8em;
-  min-height: 1.3em;
+  margin-left: var(--indent) !important; /* stupid element overrides */
+  min-height: 2ex;
 }
-dl.compact > dd, .dlCompact > dd {
-  margin-bottom: 0em;
+dl.olPercent > dt {
+  min-width: calc(var(--indent) - 2ch);
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:first-child, .break:first-child + *) {
+  margin-top: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:last-child) {
+  margin-bottom: 0;
 }
 dl > dd > dl {
   margin-top: 0.5em;
-  margin-bottom: 0em;
+  margin-bottom: 0;
 }
-dd.break {
+:is(dd, span).break {
   display: none;
 }
 
@@ -389,11 +413,11 @@ dd.break {
 a, a[href].selfRef:hover {
   text-decoration: none;
 }
-a[href].selfRef {
-  color: var(--text-color);
-}
 a[href] {
   color: var(--link-color);
+}
+a[href].selfRef, .iref + a[href].internal {
+  color: var(--text-color);
 }
 a[href]:hover {
   text-decoration: underline;
@@ -401,7 +425,7 @@ a[href]:hover {
 a[href].selfRef:hover {
   background-color: var(--highlight-color);
 }
-a.xref {
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
   white-space: nowrap;
 }
 
@@ -413,8 +437,13 @@ tt, code, pre {
 tt, code {
   /* changing the font for inline elements leads to different ascender
      and descender heights; as we want to retain baseline alignment,
-     remove leading to avoid altering the final height of lines */
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
   line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
 }
 pre {
   border: 1px solid var(--line-color);
@@ -440,6 +469,19 @@ figcaption, caption {
   text-align: left;
 }
 @media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) p {
+    margin: -2px 0;
+    max-height: 0;
+    transition: max-height 2s ease, margin 0.5s ease 0.5s;
+    overflow: hidden;
+  }
+  :is(#status-of-memo, #copyright):hover p,
+  :is(#status-of-memo, #copyright) h2:target ~ p {
+    margin: 0.5em 0;
+    max-height: 500px;
+    overflow: auto;
+  }
   pre, svg {
     display: inline-block;
     overflow-x: auto;
@@ -455,7 +497,7 @@ figcaption, caption {
     display: block;
     width: calc(100% - 25px);
   }
-  pre + .pilcrow, svg + .pilcrow {
+  :is(pre, svg) + .pilcrow {
     display: inline-block;
     vertical-align: text-bottom;
     padding-bottom: 8px;
@@ -504,17 +546,11 @@ th, td {
 th {
   background-color: var(--line-color);
 }
-tr:nth-child(2n) > td {
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
   background-color: var(--background-color);
 }
-tr:nth-child(2n+1) > td {
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
   background-color: var(--highlight-color);
-}
-thead+tbody > tr:nth-child(2n) > td {
-  background-color: var(--highlight-color);
-}
-thead+tbody > tr:nth-child(2n+1) > td {
-  background-color: var(--background-color);
 }
 table caption {
   margin: 0;
@@ -554,10 +590,15 @@ hr {
 }
 .bcp14 {
   font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
 }
-
 .role {
   font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
 }
 
 /* info block */
@@ -565,17 +606,19 @@ hr {
   margin: 0;
   font-size: var(--small-font-size);
   line-height: 18px;
-  --identifier-width: 8em;
+  --identifier-width: 15ch;
 }
 #identifiers dt {
   width: var(--identifier-width);
-  margin: 0;
+  min-width: var(--identifier-width);
   clear: left;
   float: left;
   text-align: right;
+  margin-right: 1ch;
 }
 #identifiers dd {
-  margin: 0 0 0 calc(1em + var(--identifier-width));
+  margin: 0;
+  margin-left: calc(1em + var(--identifier-width)) !important;
   min-width: 5em;
 }
 #identifiers .authors .author {
@@ -612,7 +655,7 @@ hr {
 }
 #toc nav li {
   line-height: 1.3em;
-  margin: 0.75em 0;
+  margin: 2px 0;
   padding-left: 1.2em;
   text-indent: -1.2em;
 }
@@ -623,10 +666,16 @@ hr {
 .references dt {
   text-align: right;
   font-weight: bold;
-  min-width: 7em;
+  min-width: 10ch;
+  margin-right: 1.5ch;
+}
+.references dt:target::before {
+  content: "⇒";
+  width: 15px;
+  margin: 0 10px 0 -25px;
 }
 .references dd {
-  margin-left: 8em;
+  margin-left: 12ch !important;
   overflow: auto;
 }
 
@@ -699,7 +748,7 @@ hr.addr {
     z-index: 2;
     top: 0;
     right: 0;
-    padding: 0;
+    padding: 1px 0 0 0;
     margin: 0;
     border-bottom: 1px solid #ccc;
     opacity: 0.6;
@@ -794,7 +843,7 @@ hr.addr {
     margin: 0 0 0 4px;
     font-size: var(--small-font-size);
   }
-  #toc ul p, #toc ul li {
+  #toc ul :is(p, li) {
     margin: 2px 0;
     line-height: 22px;
   }
@@ -823,16 +872,13 @@ hr.addr {
     border-top: none;
     padding-top: 0;
   }
-  figure, pre {
+  figure, pre, .vcard {
     page-break-inside: avoid;
-  }
-  figure {
-    overflow: scroll;
   }
   h1, h2, h3, h4, h5, h6 {
     page-break-after: avoid;
   }
-  h2+*, h3+*, h4+*, h5+*, h6+* {
+  :is(h2, h3, h4, h5, h6)+*, dd {
     page-break-before: avoid;
   }
   pre {
@@ -845,6 +891,9 @@ hr.addr {
   }
   td {
     border-top: 1px solid #ddd;
+  }
+  .toplink {
+    display: none;
   }
 }
 
@@ -893,24 +942,14 @@ a.toplink {
   margin: 8px 0.5em 0;
 }
 
-/* Fix the dl styling to match the RFC 7992 attributes */
-dl > dt,
-dl.dlParallel > dt {
-  float: left;
-  margin-right: 1em;
-}
-dl.dlNewline > dt {
-  float: none;
-}
-
 /* Provide styling for table cell text alignment */
-table .text-left, table .text-left {
+table .text-left {
   text-align: left;
 }
-table .text-center, table .text-center {
+table .text-center {
   text-align: center;
 }
-table .text-right, table .text-right {
+table .text-right {
   text-align: right;
 }
 
@@ -956,34 +995,6 @@ address div.right {
   text-align: right;
 }
 
-/* Give the table caption label the same styling as the figcaption */
-
-@media print {
-  .toplink {
-    display: none;
-  }
-
-  /* avoid overwriting the top border line with the ToC header */
-  #toc {
-    padding-top: 1px;
-  }
-
-  /* Avoid page breaks inside dl and author address entries */
-  dd {
-    page-break-before: avoid;
-  }
-  .vcard {
-    page-break-inside: avoid;
-  }
-
-}
-/* Tweak the bcp14 keyword presentation */
-.bcp14 {
-  font-variant: small-caps;
-  font-weight: bold;
-  font-size: 0.9em;
-}
-
 /* Dark mode. */
 @media (prefers-color-scheme: dark) {
 :root {
@@ -997,33 +1008,34 @@ address div.right {
   --pilcrow-strong: #666;
   scrollbar-color: #777 #333;
 }
-/* Trick: a prefix match works because only black and white are allowed */
-svg [stroke="black"], svg [stroke^="#000"] {
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg :is([stroke="black"], [stroke^="#000"]) {
   stroke: var(--text-color);
 }
-svg [stroke="white"], svg [stroke^="#fff"] {
+svg :is([stroke="white"], [stroke^="#fff"]) {
   stroke: var(--background-color);
 }
-svg [fill="black"], svg [fill^="#000"], svg :not([fill]) {
+svg :is([fill="black"], [fill^="#000"], :not([fill])) {
   fill: var(--text-color);
 }
-svg [stroke="fill"], svg [fill^="#fff"] {
+svg :is([fill="white"], [fill^="#fff"]) {
   fill: var(--background-color);
-}
 }
 </style>
 
 </head>
-<body>
+<body class="xml2rfc">
 <table class="ears">
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">v4-via-v6</td>
-<td class="right">March 2022</td>
+<td class="right">December 2023</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Chroboczek, et al.</td>
-<td class="center">Expires 8 September 2022</td>
+<td class="center">Expires 13 June 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1036,12 +1048,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <dd class="internet-draft">draft-chroboczek-int-v4-via-v6-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-03-07" class="published">7 March 2022</time>
+<time datetime="2023-12-11" class="published">11 December 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-09-08">8 September 2022</time></dd>
+<dd class="expires"><time datetime="2024-06-13">13 June 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1099,7 +1111,7 @@ implications.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 8 September 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 13 June 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1108,7 +1120,7 @@ implications.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
         </h2>
 <p id="section-boilerplate.2-1">
-            Copyright (c) 2022 IETF Trust and the persons identified as the
+            Copyright (c) 2023 IETF Trust and the persons identified as the
             document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.2-2">
             This document is subject to BCP 78 and the IETF Trust's Legal
@@ -1129,58 +1141,58 @@ implications.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         </h2>
 <nav class="toc"><ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
-            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-introduction" class="xref">Introduction</a></p>
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
-            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="xref">2</a>.  <a href="#name-conventions-and-definitions" class="xref">Conventions and Definitions</a></p>
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>.  <a href="#name-operation" class="xref">Operation</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-operation" class="internal xref">Operation</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
-                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="xref">3.1</a>.  <a href="#name-structure-of-the-routing-ta" class="xref">Structure of the routing table</a></p>
+                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-structure-of-the-routing-ta" class="internal xref">Structure of the routing table</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
-                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="xref">3.2</a>.  <a href="#name-operation-of-the-forwarding" class="xref">Operation of the forwarding plane</a></p>
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-operation-of-the-forwarding" class="internal xref">Operation of the forwarding plane</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
-                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="xref">3.3</a>.  <a href="#name-operation-of-routing-protoc" class="xref">Operation of routing protocols</a></p>
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-operation-of-routing-protoc" class="internal xref">Operation of routing protocols</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.1">
-                    <p id="section-toc.1-1.3.2.3.2.1.1"><a href="#section-3.3.1" class="xref">3.3.1</a>.  <a href="#name-distance-vector-routing-pro" class="xref">Distance-vector routing protocols</a></p>
+                    <p id="section-toc.1-1.3.2.3.2.1.1"><a href="#section-3.3.1" class="auto internal xref">3.3.1</a>.  <a href="#name-distance-vector-routing-pro" class="internal xref">Distance-vector routing protocols</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.2">
-                    <p id="section-toc.1-1.3.2.3.2.2.1"><a href="#section-3.3.2" class="xref">3.3.2</a>.  <a href="#name-link-state-routing-protocol" class="xref">Link-state routing protocols</a></p>
+                    <p id="section-toc.1-1.3.2.3.2.2.1"><a href="#section-3.3.2" class="auto internal xref">3.3.2</a>.  <a href="#name-link-state-routing-protocol" class="internal xref">Link-state routing protocols</a></p>
 </li>
                 </ul>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-icmp-considerations" class="xref">ICMP Considerations</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-icmp-considerations" class="internal xref">ICMP Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-security-considerations" class="xref">Security Considerations</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>.  <a href="#name-iana-considerations" class="xref">IANA Considerations</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="xref">7</a>.  <a href="#name-references" class="xref">References</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-references" class="internal xref">References</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="xref">7.1</a>.  <a href="#name-normative-references" class="xref">Normative References</a></p>
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="xref">7.2</a>.  <a href="#name-informative-references" class="xref">Informative References</a></p>
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="xref"></a><a href="#name-acknowledgments" class="xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#appendix-B" class="xref"></a><a href="#name-authors-addresses" class="xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1206,8 +1218,8 @@ address, for example:<a href="#section-1-1" class="pilcrow">¶</a></p>
 </div>
 <p id="section-1-3">When a packet is routed according to a given routing table entry, the
 forwarding plane uses a neighbor discovery protocol (the Neighbor
-Discovery protocol (ND) <span>[<a href="#rfc4861" class="xref">rfc4861</a>]</span> in the case of IPv6, the Address
-Resolution Protocol (ARP) <span>[<a href="#rfc0826" class="xref">rfc0826</a>]</span> in the case of IPv4) to map the
+Discovery protocol (ND) <span>[<a href="#RFC4861" class="cite xref">RFC4861</a>]</span> in the case of IPv6, the Address
+Resolution Protocol (ARP) <span>[<a href="#RFC0826" class="cite xref">RFC0826</a>]</span> in the case of IPv4) to map the
 next-hop address to a link-layer address (a "MAC address"), which is then
 used to construct the link-layer frames that encapsulate forwarded
 packets.<a href="#section-1-3" class="pilcrow">¶</a></p>
@@ -1229,7 +1241,7 @@ next hop can use a link-local address that is autonomously
 configured, the use of such routes enables a mode of operation where
 the network core has no statically assigned IP addresses of either
 family, which significantly reduces the amount of manual
-configuration required.  (See also <span>[<a href="#rfc7404" class="xref">rfc7404</a>]</span> for a discussion of the
+configuration required.  (See also <span>[<a href="#RFC7404" class="cite xref">RFC7404</a>]</span> for a discussion of the
 issues involved with such an approach.)<a href="#section-1-5" class="pilcrow">¶</a></p>
 <p id="section-1-6">We call a route towards an IPv4 prefix that uses an IPv6 next hop a
 "v4-via-v6" route.<a href="#section-1-6" class="pilcrow">¶</a></p>
@@ -1251,7 +1263,7 @@ cleanly in the future. }<a href="#section-1-8" class="pilcrow">¶</a></p>
       </h2>
 <p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
 "<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
-described in BCP 14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="xref">RFC8174</a>]</span> when, and only when, they
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
 appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1336,7 +1348,7 @@ use as a next-hop (e.g., not stable enough).<a href="#section-3.3-2" class="pilc
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-icmp-considerations" class="section-name selfRef">ICMP Considerations</a>
       </h2>
 <p id="section-4-1">The Internet Control Message Protocol (ICMPv4, or simply ICMP)
-<span>[<a href="#rfc0792" class="xref">rfc0792</a>]</span> is a protocol related to IPv4 that is primarily used to
+<span>[<a href="#RFC0792" class="cite xref">RFC0792</a>]</span> is a protocol related to IPv4 that is primarily used to
 carry diagnostic and debugging information.  ICMPv4 packets may be
 originated by end hosts (e.g., the "destination unreachable, port
 unreachable" ICMPv4 packet), but they may also be originated by
@@ -1344,9 +1356,9 @@ intermediate routers (e.g., most other kinds of "destination
 unreachable" packets).<a href="#section-4-1" class="pilcrow">¶</a></p>
 <p id="section-4-2">Some protocols deployed in the Internet rely on ICMPv4 packets sent
 by intermediate routers.  Most notably, path MTU Discovery (PMTUd)
-<span>[<a href="#rfc1191" class="xref">rfc1191</a>]</span> is an algorithm executed by end hosts to discover the
+<span>[<a href="#RFC1191" class="cite xref">RFC1191</a>]</span> is an algorithm executed by end hosts to discover the
 maximum packet size that a route is able to carry.  While there exist
-variants of PMTUd that are purely end-to-end <span>[<a href="#rfc4821" class="xref">rfc4821</a>]</span>, the variant
+variants of PMTUd that are purely end-to-end <span>[<a href="#RFC4821" class="cite xref">RFC4821</a>]</span>, the variant
 most commonly deployed in the Internet has a hard dependency on
 ICMPv4 packets originated by intermediate routers: if intermediate
 routers are unable to send ICMPv4 packets, PMTUd may lead to
@@ -1364,7 +1376,7 @@ IPv4 address has been assigned to the router itself (to the "loopback
 interface"), then that IPv4 address may be used as the source of
 originated ICMPv4 packets.  If no IPv4 address is available, the
 router could use the experimental mechanism described in Requirement
-R-22 of Section 4.8 <span>[<a href="#rfc7600" class="xref">rfc7600</a>]</span>, which consists of using the dummy
+R-22 of Section 4.8 <span>[<a href="#RFC7600" class="cite xref">RFC7600</a>]</span>, which consists of using the dummy
 address 192.0.0.8 as the source address of originated ICMPv4 packets.
 Note however that using the same address on multiple routers may
 hamper debugging and fault isolation, e.g., when using the
@@ -1390,8 +1402,8 @@ What if it goes:
 <code>192.168.0.1 -&gt; 192.0.0.8 -&gt; 10.10.10.10 -&gt; 192.0.0.8 -&gt; 172.16.14.2 -&gt; dest?</code>
 }<a href="#section-4-7" class="pilcrow">¶</a></p>
 <p id="section-4-8">{ Editor note / question:
-192.0.0.8 is assigned in the <span>[<a href="#IANA-IPV4-REGISTRY" class="xref">IANA-IPV4-REGISTRY</a>]</span> as the "IPv4 dummy address".
-It may be used as a Source Address, and was requested in <span>[<a href="#rfc7600" class="xref">rfc7600</a>]</span> to be used
+192.0.0.8 is assigned in the <span>[<a href="#IANA-IPV4-REGISTRY" class="cite xref">IANA-IPV4-REGISTRY</a>]</span> as the "IPv4 dummy address".
+It may be used as a Source Address, and was requested in <span>[<a href="#RFC7600" class="cite xref">RFC7600</a>]</span> to be used
 as the IPv4 source address when synthesizing an ICMPv4 packet to mirror an
 ICMPv6 error message.  This is all fine and good - but, 192.0.0.0/24 is
 commonly considered a bogon or martian<a href="#section-4-8" class="pilcrow">¶</a></p>
@@ -1450,6 +1462,7 @@ rules.<a href="#section-5-2" class="pilcrow">¶</a></p>
       <h2 id="name-references">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
+<div id="sec-normative-references">
 <section id="section-7.1">
         <h3 id="name-normative-references">
 <a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
@@ -1459,7 +1472,7 @@ rules.<a href="#section-5-2" class="pilcrow">¶</a></p>
         <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="rfc7600">[rfc7600]</dt>
+<dt id="RFC7600">[RFC7600]</dt>
         <dd>
 <span class="refAuthor">Despres, R.</span>, <span class="refAuthor">Jiang, S., Ed.</span>, <span class="refAuthor">Penno, R.</span>, <span class="refAuthor">Lee, Y.</span>, <span class="refAuthor">Chen, G.</span>, and <span class="refAuthor">M. Chen</span>, <span class="refTitle">"IPv4 Residual Deployment via IPv6 - A Stateless Solution (4rd)"</span>, <span class="seriesInfo">RFC 7600</span>, <span class="seriesInfo">DOI 10.17487/RFC7600</span>, <time datetime="2015-07" class="refDate">July 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7600">https://www.rfc-editor.org/rfc/rfc7600</a>&gt;</span>. </dd>
 <dd class="break"></dd>
@@ -1469,6 +1482,8 @@ rules.<a href="#section-5-2" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 </dl>
 </section>
+</div>
+<div id="sec-informative-references">
 <section id="section-7.2">
         <h3 id="name-informative-references">
 <a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
@@ -1478,32 +1493,33 @@ rules.<a href="#section-5-2" class="pilcrow">¶</a></p>
         <dd>
 <span class="refTitle">"IANA IPv4 Address Registry"</span>, <span class="seriesInfo">Web https://www.iana.org/assignments/iana-ipv4-special-registry/</span>. </dd>
 <dd class="break"></dd>
-<dt id="rfc0792">[rfc0792]</dt>
+<dt id="RFC0792">[RFC0792]</dt>
         <dd>
 <span class="refAuthor">Postel, J.</span>, <span class="refTitle">"Internet Control Message Protocol"</span>, <span class="seriesInfo">STD 5</span>, <span class="seriesInfo">RFC 792</span>, <span class="seriesInfo">DOI 10.17487/RFC0792</span>, <time datetime="1981-09" class="refDate">September 1981</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc792">https://www.rfc-editor.org/rfc/rfc792</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="rfc0826">[rfc0826]</dt>
+<dt id="RFC0826">[RFC0826]</dt>
         <dd>
 <span class="refAuthor">Plummer, D.</span>, <span class="refTitle">"An Ethernet Address Resolution Protocol: Or Converting Network Protocol Addresses to 48.bit Ethernet Address for Transmission on Ethernet Hardware"</span>, <span class="seriesInfo">STD 37</span>, <span class="seriesInfo">RFC 826</span>, <span class="seriesInfo">DOI 10.17487/RFC0826</span>, <time datetime="1982-11" class="refDate">November 1982</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc826">https://www.rfc-editor.org/rfc/rfc826</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="rfc1191">[rfc1191]</dt>
+<dt id="RFC1191">[RFC1191]</dt>
         <dd>
 <span class="refAuthor">Mogul, J.</span> and <span class="refAuthor">S. Deering</span>, <span class="refTitle">"Path MTU discovery"</span>, <span class="seriesInfo">RFC 1191</span>, <span class="seriesInfo">DOI 10.17487/RFC1191</span>, <time datetime="1990-11" class="refDate">November 1990</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc1191">https://www.rfc-editor.org/rfc/rfc1191</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="rfc4821">[rfc4821]</dt>
+<dt id="RFC4821">[RFC4821]</dt>
         <dd>
 <span class="refAuthor">Mathis, M.</span> and <span class="refAuthor">J. Heffner</span>, <span class="refTitle">"Packetization Layer Path MTU Discovery"</span>, <span class="seriesInfo">RFC 4821</span>, <span class="seriesInfo">DOI 10.17487/RFC4821</span>, <time datetime="2007-03" class="refDate">March 2007</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4821">https://www.rfc-editor.org/rfc/rfc4821</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="rfc4861">[rfc4861]</dt>
+<dt id="RFC4861">[RFC4861]</dt>
         <dd>
 <span class="refAuthor">Narten, T.</span>, <span class="refAuthor">Nordmark, E.</span>, <span class="refAuthor">Simpson, W.</span>, and <span class="refAuthor">H. Soliman</span>, <span class="refTitle">"Neighbor Discovery for IP version 6 (IPv6)"</span>, <span class="seriesInfo">RFC 4861</span>, <span class="seriesInfo">DOI 10.17487/RFC4861</span>, <time datetime="2007-09" class="refDate">September 2007</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4861">https://www.rfc-editor.org/rfc/rfc4861</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="rfc7404">[rfc7404]</dt>
+<dt id="RFC7404">[RFC7404]</dt>
       <dd>
 <span class="refAuthor">Behringer, M.</span> and <span class="refAuthor">E. Vyncke</span>, <span class="refTitle">"Using Only Link-Local Addressing inside an IPv6 Network"</span>, <span class="seriesInfo">RFC 7404</span>, <span class="seriesInfo">DOI 10.17487/RFC7404</span>, <time datetime="2014-11" class="refDate">November 2014</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7404">https://www.rfc-editor.org/rfc/rfc7404</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
+</div>
 </section>
 <div id="acknowledgments">
 <section id="appendix-A">

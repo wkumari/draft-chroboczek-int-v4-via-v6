@@ -5,10 +5,10 @@
 Internet Area                                              J. Chroboczek
 Internet-Draft                                 IRIF, University of Paris
 Intended status: Standards Track                               W. Kumari
-Expires: 8 September 2022                                    Google, LLC
+Expires: 13 June 2024                                        Google, LLC
                                                     T. Høiland-Jørgensen
                                                                  Red Hat
-                                                            7 March 2022
+                                                        11 December 2023
 
 
                    IPv4 routes with an IPv6 next hop
@@ -51,11 +51,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 September 2022.
+   This Internet-Draft will expire on 13 June 2024.
 
 Copyright Notice
 
-   Copyright (c) 2022 IETF Trust and the persons identified as the
+   Copyright (c) 2023 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -101,8 +101,8 @@ Table of Contents
 
    When a packet is routed according to a given routing table entry, the
    forwarding plane uses a neighbor discovery protocol (the Neighbor
-   Discovery protocol (ND) [rfc4861] in the case of IPv6, the Address
-   Resolution Protocol (ARP) [rfc0826] in the case of IPv4) to map the
+   Discovery protocol (ND) [RFC4861] in the case of IPv6, the Address
+   Resolution Protocol (ARP) [RFC0826] in the case of IPv4) to map the
    next-hop address to a link-layer address (a "MAC address"), which is
    then used to construct the link-layer frames that encapsulate
    forwarded packets.
@@ -127,7 +127,7 @@ Table of Contents
    configured, the use of such routes enables a mode of operation where
    the network core has no statically assigned IP addresses of either
    family, which significantly reduces the amount of manual
-   configuration required.  (See also [rfc7404] for a discussion of the
+   configuration required.  (See also [RFC7404] for a discussion of the
    issues involved with such an approach.)
 
    We call a route towards an IPv4 prefix that uses an IPv6 next hop a
@@ -206,7 +206,7 @@ Table of Contents
 4.  ICMP Considerations
 
    The Internet Control Message Protocol (ICMPv4, or simply ICMP)
-   [rfc0792] is a protocol related to IPv4 that is primarily used to
+   [RFC0792] is a protocol related to IPv4 that is primarily used to
    carry diagnostic and debugging information.  ICMPv4 packets may be
    originated by end hosts (e.g., the "destination unreachable, port
    unreachable" ICMPv4 packet), but they may also be originated by
@@ -215,9 +215,9 @@ Table of Contents
 
    Some protocols deployed in the Internet rely on ICMPv4 packets sent
    by intermediate routers.  Most notably, path MTU Discovery (PMTUd)
-   [rfc1191] is an algorithm executed by end hosts to discover the
+   [RFC1191] is an algorithm executed by end hosts to discover the
    maximum packet size that a route is able to carry.  While there exist
-   variants of PMTUd that are purely end-to-end [rfc4821], the variant
+   variants of PMTUd that are purely end-to-end [RFC4821], the variant
    most commonly deployed in the Internet has a hard dependency on
    ICMPv4 packets originated by intermediate routers: if intermediate
    routers are unable to send ICMPv4 packets, PMTUd may lead to
@@ -237,7 +237,7 @@ Table of Contents
    interface"), then that IPv4 address may be used as the source of
    originated ICMPv4 packets.  If no IPv4 address is available, the
    router could use the experimental mechanism described in Requirement
-   R-22 of Section 4.8 [rfc7600], which consists of using the dummy
+   R-22 of Section 4.8 [RFC7600], which consists of using the dummy
    address 192.0.0.8 as the source address of originated ICMPv4 packets.
    Note however that using the same address on multiple routers may
    hamper debugging and fault isolation, e.g., when using the
@@ -264,7 +264,7 @@ Table of Contents
 
    { Editor note / question: 192.0.0.8 is assigned in the
    [IANA-IPV4-REGISTRY] as the "IPv4 dummy address".  It may be used as
-   a Source Address, and was requested in [rfc7600] to be used as the
+   a Source Address, and was requested in [RFC7600] to be used as the
    IPv4 source address when synthesizing an ICMPv4 packet to mirror an
    ICMPv6 error message.  This is all fine and good - but, 192.0.0.0/24
    is commonly considered a bogon or martian
@@ -321,7 +321,7 @@ Table of Contents
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/rfc/rfc2119>.
 
-   [rfc7600]  Despres, R., Jiang, S., Ed., Penno, R., Lee, Y., Chen, G.,
+   [RFC7600]  Despres, R., Jiang, S., Ed., Penno, R., Lee, Y., Chen, G.,
               and M. Chen, "IPv4 Residual Deployment via IPv6 - A
               Stateless Solution (4rd)", RFC 7600, DOI 10.17487/RFC7600,
               July 2015, <https://www.rfc-editor.org/rfc/rfc7600>.
@@ -337,30 +337,30 @@ Table of Contents
               https://www.iana.org/assignments/iana-ipv4-special-
               registry/.
 
-   [rfc0792]  Postel, J., "Internet Control Message Protocol", STD 5,
+   [RFC0792]  Postel, J., "Internet Control Message Protocol", STD 5,
               RFC 792, DOI 10.17487/RFC0792, September 1981,
               <https://www.rfc-editor.org/rfc/rfc792>.
 
-   [rfc0826]  Plummer, D., "An Ethernet Address Resolution Protocol: Or
+   [RFC0826]  Plummer, D., "An Ethernet Address Resolution Protocol: Or
               Converting Network Protocol Addresses to 48.bit Ethernet
               Address for Transmission on Ethernet Hardware", STD 37,
               RFC 826, DOI 10.17487/RFC0826, November 1982,
               <https://www.rfc-editor.org/rfc/rfc826>.
 
-   [rfc1191]  Mogul, J. and S. Deering, "Path MTU discovery", RFC 1191,
+   [RFC1191]  Mogul, J. and S. Deering, "Path MTU discovery", RFC 1191,
               DOI 10.17487/RFC1191, November 1990,
               <https://www.rfc-editor.org/rfc/rfc1191>.
 
-   [rfc4821]  Mathis, M. and J. Heffner, "Packetization Layer Path MTU
+   [RFC4821]  Mathis, M. and J. Heffner, "Packetization Layer Path MTU
               Discovery", RFC 4821, DOI 10.17487/RFC4821, March 2007,
               <https://www.rfc-editor.org/rfc/rfc4821>.
 
-   [rfc4861]  Narten, T., Nordmark, E., Simpson, W., and H. Soliman,
+   [RFC4861]  Narten, T., Nordmark, E., Simpson, W., and H. Soliman,
               "Neighbor Discovery for IP version 6 (IPv6)", RFC 4861,
               DOI 10.17487/RFC4861, September 2007,
               <https://www.rfc-editor.org/rfc/rfc4861>.
 
-   [rfc7404]  Behringer, M. and E. Vyncke, "Using Only Link-Local
+   [RFC7404]  Behringer, M. and E. Vyncke, "Using Only Link-Local
               Addressing inside an IPv6 Network", RFC 7404,
               DOI 10.17487/RFC7404, November 2014,
               <https://www.rfc-editor.org/rfc/rfc7404>.
