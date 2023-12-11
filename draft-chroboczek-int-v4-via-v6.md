@@ -27,11 +27,13 @@ author:
     - 75205 Paris Cedex 13
     - France
     email: jch@irif.fr
+
  -
     name: Warren Kumari
     ins: W. Kumari
     organization: Google, LLC
     email: warren@kumari.net
+
  -
     name: Toke Høiland-Jørgensen
     organization: Red Hat
@@ -152,7 +154,7 @@ packet, determines the next-hop address, and forwards the packet to the
 next-hop address.
 
 With v4-via-v6 routing, the address family of the next-hop address is no
-longer dermined by the address family of the prefix: since the routing
+longer determined by the address family of the prefix: since the routing
 table may map an IPv4 prefix to either an IPv4 or an IPv6 next-hop, the
 forwarding plane must be able to determine, on a per-packet basis, whether
 the next-hop address is an IPv4 or an IPv6 address, and to use that
