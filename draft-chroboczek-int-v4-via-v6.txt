@@ -176,7 +176,7 @@ Table of Contents
    the packet to the next-hop address.
 
    With v4-via-v6 routing, the address family of the next-hop address is
-   no longer dermined by the address family of the prefix: since the
+   no longer determined by the address family of the prefix: since the
    routing table may map an IPv4 prefix to either an IPv4 or an IPv6
    next-hop, the forwarding plane must be able to determine, on a per-
    packet basis, whether the next-hop address is an IPv4 or an IPv6
