@@ -5,7 +5,7 @@ category: std
 submissiontype: IETF
 ipr: trust200902
 
-docname: draft-chroboczek-int-v4-via-v6-latest
+docname: draft-chroboczek-intarea-v4-via-v6-latest
 v: 3
 area: "Internet Engineering Steering Group"
 workgroup: "Internet Area"
@@ -43,12 +43,13 @@ normative:
   RFC7600:
 
 informative:
-  RFC4861:
-  RFC0826:
-  RFC7404:
   RFC0792:
+  RFC0826:
   RFC1191:
   RFC4821:
+  RFC4861:
+  RFC7404:
+  RFC8950:
   IANA-IPV4-REGISTRY:
     title: IANA IPv4 Address Registry
     author:
@@ -65,6 +66,9 @@ addresses for routing IPv4 packets, thus making it possible to route IPv4
 packets across a network where routers have not been assigned IPv4
 addresses.  We describe the technique, and discuss its operational
 implications.
+
+{ Editor note: This document was originally accidentally published as draft-chroboczek-int-v4-via-v6, and later renamed to draft-chroboczek-intarea-v4-via-v6 (note int vs intarea). The Github repo
+uses the old name. }
 
 --- middle
 
@@ -104,7 +108,7 @@ using the OSI protocol suite).
 The case of routing IPv4 packets through an IPv6 next hop is
 particularly interesting, since it makes it possible to build
 networks that have no IPv4 addresses except at the edges and still
-provide IPv4 connectivity to edge hosts.  In addition, since an IPv6
+provide IPv4 connectivity to edge hosts. In addition, since an IPv6
 next hop can use a link-local address that is autonomously
 configured, the use of such routes enables a mode of operation where
 the network core has no statically assigned IP addresses of either
@@ -115,16 +119,21 @@ issues involved with such an approach.)
 We call a route towards an IPv4 prefix that uses an IPv6 next hop a
 "v4-via-v6" route.
 
-This document discusses the protocol design and operations implications
-of such routes and is designed to be used as a reference for future
-documents.
+{{RFC8950}} discusses advertising of IPv4 NLRI with a next-hop address that
+belongs to the IPv6 protocol, but confines itself to how this is carried and
+advertised in the BGP protocol.
+
+This document is much more general, and discusses the concept of v4-via-v6
+routes themselves, the design and operational considerations, and the
+implications of using them.
 
 { Editor note, to be removed before publication. This document is heavily based
 on draft-ietf-babel-v4viav6. When draft-ietf-babel-v4viav6 was
 going through IESG eval, Warren raised concerns that something this
 fundamental deserved to be documented in a separate, standalone document, so
 that it can be more fully discussed, and, more importantly, referenced
-cleanly in the future. }
+cleanly in the future.}
+
 
 # Conventions and Definitions
 
@@ -240,6 +249,8 @@ just come to understand that the repeated 192.0.0.8 is not actually a looping
 packet, but rather that the packet is (probably!) making forward progress?
 What if it goes:
 `192.168.0.1 -> 192.0.0.8 -> 10.10.10.10 -> 192.0.0.8 -> 172.16.14.2 -> dest?`
+
+In addition, see RFC5837, and, as a side note, Bill Fenner is working on an update to this document.
 }
 
 { Editor note / question:
@@ -270,6 +281,32 @@ major issue? Would requesting another address be a better solution? Would it hel
 likely require "magic" to allow it to pass BCP38 filters.
 }
 
+# Implementation Status
+( This section to be removed before publication. )
+
+As this document does not really define a protocol, this implementation status
+section is much less formal. Instead, it is being used as a place to list implementations which are known to support this functionality, examples, notes, etc. This information is provided as a guide to the reader, and is not intended to be a complete list, nor endorsement, etc. If you know of an implementation which is not listed, please let the authors know.
+
+## Mikrotik RouterOS
+
+Mikrotik RouterOS Version 7.11beta2.
+{Editor note: I believe it has been supported for a very ling time, but this was the version I tested with. Reminder to self to ask Mikrotik when it was added.}
+
+As an example:
+```
+[wkumari@Dulles-CCR] /ip/route> print
+Flags: D - DYNAMIC; I - INACTIVE, A - ACTIVE; c - CONNECT, s - STATIC, d - DHCP, v - VPN; H - HW-OFFLOADED
+Columns: DST-ADDRESS, GATEWAY, DISTANCE
+#      DST-ADDRESS       GATEWAY                             DISTANCE
+0  As  192.0.2.0/24      fe80::201:5cff:feb2:1646%1_Comcast         1
+```
+
+## Arista EOS
+
+
+Arista has supported static IPv4 routes with IPv6 nexthops since EOS-4.30.1.
+
+
 # Security Considerations
 
 The techniques described in this document make routing more flexible by
@@ -291,7 +328,6 @@ rules.
 # IANA Considerations
 
 This document has no IANA actions.
-
 
 --- back
 
