@@ -1,0 +1,128 @@
+
+
+
+
+Internet Area                                              J. Chroboczek
+Internet-Draft                                 IRIF, University of Paris
+Intended status: Standards Track                               W. Kumari
+Expires: 25 July 2024                                        Google, LLC
+                                                    T. Høiland-Jørgensen
+                                                                 Red Hat
+                                                         22 January 2024
+
+
+                   IPv4 routes with an IPv6 next hop
+                 draft-chroboczek-int-v4-via-v6-latest
+
+Abstract
+
+   Tombstone.
+
+   This document was misnamed when first submitted, and has been renamed
+   to draft-chroboczek-intarea-v4-via-v6.
+
+   Tombstone.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at
+   https://wkumari.github.io/draft-chroboczek-int-v4-via-v6/draft-
+   chroboczek-int-v4-via-v6.html.  Status information for this document
+   may be found at https://datatracker.ietf.org/doc/draft-chroboczek-
+   int-v4-via-v6/.
+
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/wkumari/draft-chroboczek-int-v4-via-v6.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 25 July 2024.
+
+Copyright Notice
+
+   Copyright (c) 2024 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Security Considerations
+   3.  IANA Considerations
+   4.  Normative References
+   Acknowledgments
+   Authors' Addresses
+
+1.  Introduction
+
+   The new document lives at [I-D.chroboczek-intarea-v4-via-v6].
+
+   The new document repository can be found at
+   https://wkumari.github.io/draft-chroboczek-intarea-v4-via-v6/draft-
+   chroboczek-intarea-v4-via-v6.html (https://wkumari.github.io/draft-
+   chroboczek-intarea-v4-via-v6/draft-chroboczek-intarea-v4-via-
+   v6.html).
+
+2.  Security Considerations
+
+   None.
+
+3.  IANA Considerations
+
+   This document has no IANA actions.
+
+4.  Normative References
+
+   [I-D.chroboczek-intarea-v4-via-v6]
+              Chroboczek, J., Kumari, W. A., and T. Høiland-Jørgensen,
+              "IPv4 routes with an IPv6 next hop", Work in Progress,
+              Internet-Draft, draft-chroboczek-intarea-v4-via-v6-00, 21
+              January 2024, <https://datatracker.ietf.org/doc/html/
+              draft-chroboczek-intarea-v4-via-v6-00>.
+
+Acknowledgments
+
+   TODO acknowledge.
+
+Authors' Addresses
+
+   Juliusz Chroboczek
+   IRIF, University of Paris
+   Case 7014
+   75205 Paris Cedex 13
+   France
+   Email: jch@irif.fr
+
+
+   Warren Kumari
+   Google, LLC
+   Email: warren@kumari.net
+
+
+   Toke Høiland-Jørgensen
+   Red Hat
+   Email: toke@toke.dk
