@@ -5,7 +5,7 @@ category: std
 submissiontype: IETF
 ipr: trust200902
 
-docname: draft-chroboczek-intarea-v4-via-v6-latest
+docname: draft-chroboczek-int-v4-via-v6-latest
 v: 3
 area: "Internet Engineering Steering Group"
 workgroup: "Internet Area"
